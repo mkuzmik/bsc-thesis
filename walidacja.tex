@@ -1,0 +1,149 @@
+\chapter{Walidacja rezultatów}
+\label{cha:walidacja}
+
+Pomimo, że testy oraz skuteczność poszczególnych klasyfikatorów zostały przedstawione w rozdziale \ref{cha:analizaDanych}, to wciąż nie można było ocenić jak system klasyfikacji zachowa się przy użyciu faktycznych danych wprowadzonych przez użytkownika. Z tego powodu w tym rozdziale opisano testy przeprowadzone przy użyciu rzeczywistych danych.
+
+Testy przeprowadziłem bazując na artykułach ze strony BBC News\footnote{https://www.bbc.com/news} oraz BBC Sport \footnote{https://www.bbc.com/sport}. W zbiorze danych uczących nie znalazły się żadne artykuły z tych serwisów, więc wyniki testów powinny być obiektywne.
+
+\section{Założenia}
+
+\subsection{Zbiór uczący}
+
+W zbiorze uczącym znalazło się 5000 artykułów z poszczególnych kategorii:
+
+\begin{enumerate}
+    \item Biznes.
+    \item Sport.
+    \item Rozrywka.
+    \item Polityka.
+    \item Technologia.
+\end{enumerate}
+
+Zbiór zawierał po 500 artykułów z każdej wymienionej kategorii, z czego każdy artykuł miał około 60 słów. W opcjach aplikacji możliwy był wybór jednego z trzech algorytmów: naiwny klasyfikator bayesowski, metoda wektorów nośnych oraz algorytm K najbliższych sąsiadów. Jesteśmy również w stanie zdefiniować rozmiar zbioru jaki zostanie użyty w uczenia algorytmu (maksymalnie 2500 elementów).
+
+Przed uczeniem algorytmu dane są wstępnie przetwarzane metodami opisanymi w rozdziale \ref{cha:analizaDanych} oraz sprowadzane do modelu TF-IDF.
+
+\subsection{Zbiór testowy}
+
+W zbiorze testowym znalazło się 93 artykuły ze strony BBC News. Wszystkie artykuły pochodziły z kategorii takich samych lub analogicznych do kategorii artykułów ze zbioru uczącego. Zbiór zawierał po 40 artykułów o polityce, sporcie oraz technologii, 39 artykułów o rozrywce oraz 34 biznesowych artykułów. Łącznie w każdym teście zostały klasyfikowane 193 artykuły.
+
+\section{Metodologia}
+
+Do przeprowadzenia testów serwisu klasyfikacji napisałem skrypt wykonujący testy typu 'end-to-end', czyli testujące całą aplikację, nie tylko poszczególne komponenty. Pomijany jest jedynie interfejs użytkownika. Skrypt testujący pobiera dane z pliku JSON, który ma strukturę listy z której każdy element odzwierciedla jeden przypadek testowy. Następnie wykonywane jest zapytanie REST do serwisu i uzyskany wynik porównywany jest do oczekiwanego (zdefiniowanego w pliku z danymi testowymi).
+
+Jako parametry pojedynczego testu podany zostanie jeden algorytm (klasyfikator bayesowski, metoda wektorów nośnych lub algorytm k najbliższych sąsiadów) oraz ilość danych w zbiorze uczącym (10, 50, 100, 200, 500, 1000 lub 2000 elementów). Zostanie również zmierzony czas przeprowadzenia testu. Pozwoli to wybrać optymalny algorytm oraz ilość danych. Plik wejściowy z danymi do testu oraz plik wyjściowy z wynikiem testu są w formacie JSON.
+
+Przykładowy plik testowy:
+
+\begin{verbatim}
+[
+  {
+    "content": "US financial markets were mixed on F...",
+    "label": "business"
+  },
+  {
+    "content": "Evidence that adverts for major brands...",
+    "label": "technology"
+  }
+]
+\end{verbatim}
+
+Przykładowy rezultat testu:
+
+\begin{verbatim}
+{
+  'fail_info': [
+    {
+      'actual_label': 'technology',
+      'content': 'US financial markets were mixed on Friday after a ',
+      'expected_label': 'business'
+    }
+  ],
+  'failed': 1,
+  'passed': 1,
+  'test_cases': 2,
+  'test_params': {
+    'dataset_size': 30,
+    'model': 'naive-bayes'
+  }
+}
+\end{verbatim}
+
+\section{Klasyfikacja całych artykułów}
+
+W pierwszym teście będę klasyfikował artykuły w całości - jako wejście aplikacji zostanie podana cała zawartość wybranego tekstu. Wynik odzwierciedla jaka część artykułów została sklasyfikowana poprawnie (np. 80\% oznacza, że 8 na 10 artykułom została przypisana odpowiednia kategoria).
+
+Warty zauważenia jest fakt, że dysponujemy pięcioma kategoriami w zbiorze testowym - algorytm losujący kategorie powinien osiągać skuteczność około 20\%.
+
+\begin{center}
+\begin{longtable}{ |l|l|l|l| } 
+ \hline
+ Algorytm & Rozmiar zbioru uczącego & Wynik & Czas wykonania testu \\ 
+ \hline
+ naiwny klasyfikator bayesowski & 10    & 46.11\% & 61s\\
+ naiwny klasyfikator bayesowski & 50    & 64.25\% & 58s\\
+ naiwny klasyfikator bayesowski & 100   & 75.65\% & 59s\\
+ naiwny klasyfikator bayesowski & 200   & 74.09\% & 68s\\
+ naiwny klasyfikator bayesowski & 500   & 78.24\% & 105s\\
+ naiwny klasyfikator bayesowski & 1000  & 75.13\% & 172s\\
+ naiwny klasyfikator bayesowski & 2000  & 76.68\% & 296s\\
+\hline
+ metoda wektorów nośnych & 10   & 36.27\% & 44s\\
+ metoda wektorów nośnych & 50   & 50.78\% & 49s\\
+ metoda wektorów nośnych & 100  & 48.70\% & 57s\\
+ metoda wektorów nośnych & 200  & 51.81\% & 72s\\
+ metoda wektorów nośnych & 500  & 54.40\% & 128s\\
+ metoda wektorów nośnych & 1000 & 51.81\% & 261s\\
+ metoda wektorów nośnych & 2000 & 55.96\% & 704s\\
+\hline
+ k najbliższych sąsiadów & 10   & 33.68\% & 50s\\
+ k najbliższych sąsiadów & 50   & 56.48\% & 63s\\
+ k najbliższych sąsiadów & 100  & 61.14\% & 58s\\
+ k najbliższych sąsiadów & 200  & 67.88\% & 69s\\
+ k najbliższych sąsiadów & 500  & 67.88\% & 106s\\
+ k najbliższych sąsiadów & 1000 & 70.98\% & 169s\\
+ k najbliższych sąsiadów & 2000 & 70.47\% & 337s\\
+ \hline
+\end{longtable}
+\end{center}
+
+Najlepsze wyniki aplikacja osiągnęła stosując naiwny klasyfikator bayesowski. Już przy danych uczących w ilości 100 elementów ponad 3 na 4 artykuły zostały sklasyfikowane poprawnie.
+W metodzie wektorów nośnych oraz klasyfikatorze bayesowskim przy zbiorach danych większym niż 500 elementów nastąpiło pogorszenie wyniku - mamy tu do czynienia ze zjawiskiem nadmiernego dopasowania (ang. overfitting) \footnote{https://pl.wikipedia.org/wiki/Nadmierne_dopasowanie}, czyli model zbyt dobrze dopasowuje się do danych uczących przez co osiąga na nich dobre wyniki, ale radzi sobie dużo gorzej z danymi spoza zbiorów uczących.
+
+\section{Klasyfikacja części artykułów}
+
+Kolejny test zostanie przeprowadzony jedynie na części tekstu. Z każdego artykułu w powyższym teście zostały wycięte 3 zdania, które zostaną poddane klasyfikacji. Wyniki prezentują się następująco:
+
+\begin{center}
+\begin{longtable}{ |l|l|l|l| } 
+ \hline
+ Algorytm & Rozmiar zbioru uczącego & Wynik & Czas wykonania testu \\ 
+ \hline
+ naiwny klasyfikator bayesowski & 10    & 43.52\% & 51s\\
+ naiwny klasyfikator bayesowski & 50    & 66.84\% & 63s\\
+ naiwny klasyfikator bayesowski & 100   & 66.84\% & 60s\\
+ naiwny klasyfikator bayesowski & 200   & 68.91\% & 78s\\
+ naiwny klasyfikator bayesowski & 500   & 76.17\% & 116s\\
+ naiwny klasyfikator bayesowski & 1000  & 76.68\% & 181s\\
+ naiwny klasyfikator bayesowski & 2000  & 78.24\% & 324s\\
+\hline
+ metoda wektorów nośnych & 10   & 41.45\% & 48s\\
+ metoda wektorów nośnych & 50   & 50.78\% & 54s\\
+ metoda wektorów nośnych & 100  & 54.92\% & 64s\\
+ metoda wektorów nośnych & 200  & 51.30\% & 107s\\
+ metoda wektorów nośnych & 500  & 53.37\% & 139s\\
+ metoda wektorów nośnych & 1000 & 48.70\% & 283s\\
+ metoda wektorów nośnych & 2000 & 54.40\% & 695s\\
+\hline
+ k najbliższych sąsiadów & 10   & 34.20\% & 47s\\
+ k najbliższych sąsiadów & 50   & 58.03\% & 53s\\
+ k najbliższych sąsiadów & 100  & 62.18\% & 60s\\
+ k najbliższych sąsiadów & 200  & 64.77\% & 105s\\
+ k najbliższych sąsiadów & 500  & 64.77\% & 113s\\
+ k najbliższych sąsiadów & 1000 & 66.84\% & 194s\\
+ k najbliższych sąsiadów & 2000 & 71.50\% & 330s\\
+ \hline
+\end{longtable}
+\end{center}
+
+Powyższe wyniki dowodzą, że nie potrzebujemy całej treści artykułu, aby móc określić jego kategorię. Analizując jedynie części tekstu (w tym wypadku 3 losowo wybrane zdania) możemy stwierdzić, że wybrany fragment jest klasyfikowany z bardzo podobnym rezultatem co jego całość.

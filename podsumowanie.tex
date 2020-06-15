@@ -1,0 +1,15 @@
+\chapter{Podsumowanie}
+\label{cha:podsumowanie}
+
+Badania oraz aplikacja wykonana w ramach tej pracy dowiodły, że wykorzystanie metod nauczania maszynowego do klasyfikacji języka naturalnego w formie danych tekstowych przynosi oczekiwane rezultaty. Zastosowane algorytmy są w stanie wspierać człowieka oraz automatyzować jego pracę w związku z przetwarzaniem dużej ilości danych.
+
+
+W ramach pracy udało się rozwinąć system, który jest w stanie przetwarzać i kategoryzować dane w formie tekstu napisanego za pomocą języka naturalnego. Zaproponowane rozwiązanie wyróżnia się dużymi możliwościami konfiguracji. W pracy wykorzystałem dane pochodzące z serwisów informacyjnych, pogrupowane według tematyki, której dotyczą. Możemy jednak dostarczyć własne dane opisane kategoriami, które chcemy uzyskać jako wynik działania programu - wtedy system będzie klasyfikował tekst bazując na dostarczonych zbiorach danych. Dodatkową możliwością jest wybór algorytmu oraz ilość danych uczących, tak aby skuteczność i szybkość działania były optymalne dla potrzeb użytkownika.
+
+Kolejną mocną stroną rozwiniętego systemu klasyfikacji jest prosty interfejs, który może być użyty przez użytkowników bez wiedzy technicznej. Zazwyczaj oprogramowanie tego typu jest przeznaczone dla programistów i wymaga ono integracji z własnym programami. Tutaj natomiast możliwa jest interakcja poprzez przeglądarkę bezpośrednio z treściami dostępnymi na stronach internetowych, dzięki czemu poprawnie skonfigurowany i wdrożony system klasyfikacji jest dostępny dla każdego użytkownika. Serwis klasyfikacji posiada również całą funkcjonalność dostępną poprzez protokół HTTP. Daje nam to możliwość zastosowania serwisu w istniejących już aplikacjach.
+
+System kategoryzacji wymaga konfiguracji parametrów algorytmu uczącego za każdym wywołaniem. Użytkownik powinien mieć możliwość automatycznego wyboru algorytmu, który najlepiej sprawdzi się na jego danych. Wstępne przetwarzanie danych oraz reprezentacja numeryczna tekstu oparte zostały na podstawowych metodach, przez co znaczna część informacji z tekstu jest tracona. Gdyby zostały użyte bardziej złożone techniki - rezultaty powinny być lepsze.
+
+W przyszłości aplikacja powinna być rozwinięta pod względem interakcji z użytkownikiem. Obecny interfejs w postaci dodatku do przeglądarki Chrome jest wygodny w kontekście kategoryzacji danych znajdujących się bezpośrednio na stronach internetowych, lecz nie powala na przetwarzanie dużych ilości danych znajdujących się w plikach, lub w innych źródłach.
+
+Kolejnym elementem, który powinien być dalej rozwijany jest klasyfikacja danych w wielu wymiarach. Aplikacja powinna przypisywać do tekstu wiele kategorii (np. rodzaj tekstu, użyty język, wyrażane emocje), które pozwoliłyby na bardziej precyzyjny opis danych.
